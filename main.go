@@ -10,25 +10,23 @@ import (
 )
 
 var (
-	addr           string
+	addr string
 )
 
 func main() {
-
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Fatal(err)
 	}
 
 	flag.StringVar(&addr, "http", os.Getenv("ADDR"), "HTTP listen address")
 	flag.Parse()
 
-
 	fs := fulfillment.NewServer()
 	fs.Addr = addr
 	fs.DisableBasicAuth = true
-	fs.Actions.Set("create_cluster", actions.CreateCluster)
 
+	fs.Actions.Set("create_cluster", actions.CreateClusterHandler)
 
 	if err := fs.ListenAndServe(); err != nil {
 		log.Println(err)
