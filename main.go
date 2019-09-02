@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"github.com/joho/godotenv"
-	"github.com/kelseyhightower/dialogflow/fulfillment"
 	"github.com/locmai/assistant/actions"
 	"log"
 	"os"
@@ -22,7 +21,7 @@ func main() {
 	flag.StringVar(&addr, "http", os.Getenv("ADDR"), "HTTP listen address")
 	flag.Parse()
 
-	fs := fulfillment.NewServer()
+	fs := NewServer()
 	fs.Addr = addr
 	fs.DisableBasicAuth = true
 
