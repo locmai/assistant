@@ -2,10 +2,17 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/joho/godotenv"
 	"github.com/locmai/assistant/actions"
+	"github.com/locmai/assistant/server"
 	"log"
 	"os"
+	"path/filepath"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 var (
@@ -13,7 +20,39 @@ var (
 )
 
 func main() {
-	err := godotenv.Load(".env")
+
+	var kubeconfig *string
+	if home := homeDir(); home != "" {
+		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
+	} else {
+		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+	}
+	flag.Parse()
+
+	// Use the current context in kubeconfig to build flag
+	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Create the kubernetes client
+	k8sClient, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Try to list the Pods
+	pods, err := k8sClient.CoreV1().Pods("").List(metav1.ListOptions{})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("There are %d pods in the cluster\n", len(pods.Items))
+	for index := range pods.Items {
+		fmt.Printf("Pod %v: %s \n", index+1, pods.Items[index].Name )
+	}
+
+	// Load env var from .env
+	err = godotenv.Load(".env")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -21,7 +60,7 @@ func main() {
 	flag.StringVar(&addr, "http", os.Getenv("ADDR"), "HTTP listen address")
 	flag.Parse()
 
-	fs := NewServer()
+	fs := server.NewServer()
 	fs.Addr = addr
 	fs.DisableBasicAuth = true
 
@@ -30,4 +69,12 @@ func main() {
 	if err := fs.ListenAndServe(); err != nil {
 		log.Println(err)
 	}
+}
+
+func homeDir() string {
+	// For Mac and Linux users
+	if h := os.Getenv("HOME"); h != "" {
+		return h
+	}
+	return os.Getenv("USERPROFILE") // For Windows users
 }
