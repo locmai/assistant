@@ -5,20 +5,21 @@
 package server
 
 import (
-"context"
-"crypto/tls"
-"encoding/json"
-"errors"
-"io/ioutil"
-"log"
-"net/http"
-"os"
-"os/signal"
-"syscall"
+	"context"
+	"crypto/tls"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
-"golang.org/x/crypto/acme/autocert"
-"golang.org/x/crypto/bcrypt"
-"google.golang.org/api/dialogflow/v2"
+	"golang.org/x/crypto/acme/autocert"
+	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/api/dialogflow/v2"
 )
 
 // ErrEmptyHashedPassword is returned from ListenAndServe and ListenAndServeTLS when basic
@@ -118,7 +119,7 @@ func NewServer() *Server {
 
 	fulfillment := http.NewServeMux()
 	fulfillment.Handle("/", Handler(s.Actions))
-	fulfillment.HandleFunc("/healthz", s.healthHandler)
+	fulfillment.HandleFunc("/health", s.healthHandler)
 	s.Server = &http.Server{Handler: fulfillment}
 
 	return s
@@ -126,6 +127,7 @@ func NewServer() *Server {
 
 func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(s.Status())
+	fmt.Fprintf(w, "Healthy!\n")
 }
 
 type handler struct {

@@ -14,5 +14,6 @@ require (
 	google.golang.org/appengine v1.6.2 // indirect
 	google.golang.org/genproto v0.0.0-20190819201941-24fa4b261c55
 	google.golang.org/grpc v1.23.0 // indirect
-	k8s.io/client-go v0.0.0-20190831074946-3fe2abece89e // indirect
+	k8s.io/apimachinery v0.0.0-20190831074630-461753078381
+	k8s.io/client-go v0.0.0-20190831074946-3fe2abece89e
 )
