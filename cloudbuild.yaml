@@ -1,0 +1,11 @@
+steps:
+  # Build the helloworld container image.
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "build"
+      - "-t"
+      - "asia.gcr.io/${PROJECT_ID}/techcon-yuta:${TAG_NAME}"
+      - "."
+
+images:
+  - asia.gcr.io/${PROJECT_ID}/techcon-yuta:${TAG_NAME}

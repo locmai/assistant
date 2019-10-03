@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: techcon-yuta
+spec:
+  selector:
+    matchLabels:
+      app: techcon-yuta
+  template:
+    metadata:
+      labels:
+        app: techcon-yuta
+    spec:
+      volumes:
+        - name: techcon-admin
+          secret:
+            secretName: techcon-admin
+      containers:
+        - name: techcon-yuta
+          image: asia.gcr.io/techcon/techcon-yuta:0.0.1
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: techcon-admin
+              mountPath: /var/secrets/google
+          env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /var/secrets/google/TechCon.json
