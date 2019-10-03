@@ -5,7 +5,7 @@ RUN go mod download && CGO_ENABLED=0 GOOS=linux go build .
 
 FROM scratch
 COPY --from=0 /go/src/github.com/locmai/app/assistant .
-COPY --from=0 /go/src/github.com/locmai/app/.env .
+COPY --from=0 /go/src/github.com/locmai/app/example.env ./.env
 
 EXPOSE 8080
 
