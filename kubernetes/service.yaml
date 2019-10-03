@@ -3,6 +3,7 @@ kind: Service
 metadata:
   name: techcon-yuta
 spec:
+  type: NodePort
   selector:
     app: techcon-yuta
   ports:

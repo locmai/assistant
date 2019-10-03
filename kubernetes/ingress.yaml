@@ -1,0 +1,16 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: example-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: production-ip
+    networking.gke.io/managed-certificates: yuta-cert
+spec:
+  rules:
+    - host: yuta.locmai.dev
+      http:
+        paths:
+          - path: "/"
+            backend:
+              serviceName: techcon-yuta
+              servicePort: 80

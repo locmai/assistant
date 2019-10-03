@@ -17,7 +17,7 @@ spec:
             secretName: techcon-admin
       containers:
         - name: techcon-yuta
-          image: asia.gcr.io/techcon/techcon-yuta:0.0.1
+          image: asia.gcr.io/techcon/techcon-yuta:0.0.2
           resources:
             limits:
               memory: "128Mi"
