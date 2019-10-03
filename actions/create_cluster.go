@@ -33,21 +33,22 @@ func CreateClusterHandler(q *dialogflow.GoogleCloudDialogflowV2WebhookRequest) (
 
 	//Some default values, TO-DO: Update to configure the value
 	defaultLocation := "asia-northeast1-a"
-	projectId := "techcon"
+	projectID := "techcon"
 
 	clusterRequest := containerpb.CreateClusterRequest{
 		Cluster: NewCluster(int32(parameters.Nodes), defaultLocation),
-		Parent:  fmt.Sprintf("projects/%s/location/%s", projectId, defaultLocation),
+		Parent:  fmt.Sprintf("projects/%s/location/%s", projectID, defaultLocation),
 	}
 
-	operation, err := client.CreateCluster(ctx, &clusterRequest)
+	// operation, err := client.CreateCluster(ctx, &clusterRequest)
+	go client.CreateCluster(ctx, &clusterRequest)
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	log.Print(operation.Name)
-	log.Print(operation.StatusMessage)
+	// log.Print(operation.Name)
+	// log.Print(operation.StatusMessage)
 
 	response := &dialogflow.GoogleCloudDialogflowV2WebhookResponse{
 		FulfillmentText: fmt.Sprintf("Creating a Kubernetes cluster with %v nodes. That's what I called \"Kubernetes the easy way.\"", parameters.Nodes),
@@ -56,6 +57,7 @@ func CreateClusterHandler(q *dialogflow.GoogleCloudDialogflowV2WebhookRequest) (
 	return response, nil
 }
 
+// NewCluster for creating new cluster options
 func NewCluster(nodes int32, location string) *containerpb.Cluster {
 	cluster := containerpb.Cluster{
 		Name:             "techcon",
@@ -67,6 +69,7 @@ func NewCluster(nodes int32, location string) *containerpb.Cluster {
 	return &cluster
 }
 
+// DefaultNodeConfig set the node config
 func DefaultNodeConfig() *containerpb.NodeConfig {
 	nodeConfig := containerpb.NodeConfig{
 		MachineType: "g1-small",
