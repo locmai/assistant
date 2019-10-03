@@ -15,18 +15,28 @@ spec:
         - name: techcon-admin
           secret:
             secretName: techcon-admin
+            items:
+              - key: techcon-admin.json
+                path: techcon-admin.json
       containers:
         - name: techcon-yuta
-          image: asia.gcr.io/techcon/techcon-yuta:0.0.2
+          image: asia.gcr.io/techcon/techcon-yuta:0.0.3
           resources:
             limits:
               memory: "128Mi"
               cpu: "500m"
           ports:
             - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
           volumeMounts:
             - name: techcon-admin
               mountPath: /var/secrets/google
           env:
             - name: GOOGLE_APPLICATION_CREDENTIALS
-              value: /var/secrets/google/TechCon.json
+              value: /var/secrets/google/techcon-admin.json
