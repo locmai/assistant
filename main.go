@@ -24,13 +24,13 @@ func main() {
 	// }
 	// flag.Parse()
 
-	// Use the current context in kubeconfig to build flag
+	// // Use the current context in kubeconfig to build flag
 	// config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
 
-	// Create the kubernetes client
+	// // Create the kubernetes client
 	// k8sClient, err := kubernetes.NewForConfig(config)
 	// if err != nil {
 	// 	log.Fatal(err)
@@ -41,9 +41,9 @@ func main() {
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
-	// fmt.Printf("There are %d pods in the cluster\n", len(pods.Items))
+	// fmt.Printf("Checking kube-system: %v pods \n", len(pods.Items))
 	// for index := range pods.Items {
-	// 	fmt.Printf("Pod %v: %s \n", index+1, pods.Items[index].Name )
+	// 	fmt.Printf("Pod %v: %s \n", index+1, pods.Items[index].Name)
 	// }
 
 	// Load env var from .env
@@ -60,7 +60,7 @@ func main() {
 	fs.DisableBasicAuth = true
 
 	fs.Actions.Set("create_cluster", actions.CreateClusterHandler)
-
+	fs.Actions.Set("scale_deployment", actions.ScaleDeploymentHandler)
 	log.Println("Server is started")
 
 	if err := fs.ListenAndServe(); err != nil {

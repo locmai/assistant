@@ -15,6 +15,7 @@ type createParameters struct {
 	Nodes float64 `json:"nodes"`
 }
 
+// CreateClusterHandler handler for create cluster event
 func CreateClusterHandler(q *dialogflow.GoogleCloudDialogflowV2WebhookRequest) (*dialogflow.GoogleCloudDialogflowV2WebhookResponse, error) {
 	var parameters createParameters
 
@@ -40,16 +41,8 @@ func CreateClusterHandler(q *dialogflow.GoogleCloudDialogflowV2WebhookRequest) (
 		Parent:  fmt.Sprintf("projects/%s/location/%s", projectID, defaultLocation),
 	}
 
-	// operation, err := client.CreateCluster(ctx, &clusterRequest)
-	go client.CreateCluster(ctx, &clusterRequest)
-
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// log.Print(operation.Name)
-	// log.Print(operation.StatusMessage)
-
+	// go client.CreateCluster(ctx, &clusterRequest)
+	client.CreateCluster(ctx, &clusterRequest)
 	response := &dialogflow.GoogleCloudDialogflowV2WebhookResponse{
 		FulfillmentText: fmt.Sprintf("Creating a Kubernetes cluster with %v nodes. That's what I called \"Kubernetes the easy way.\"", parameters.Nodes),
 	}

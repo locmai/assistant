@@ -20,7 +20,7 @@ spec:
                 path: techcon-admin.json
       containers:
         - name: techcon-yuta
-          image: asia.gcr.io/techcon/techcon-yuta:0.0.5
+          image: asia.gcr.io/techcon/techcon-yuta:0.0.6
           resources:
             limits:
               memory: "128Mi"
