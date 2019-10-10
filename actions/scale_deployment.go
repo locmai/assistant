@@ -6,10 +6,13 @@ import (
 	"os"
 	"path/filepath"
 
+	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
+
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
-
+	"k8s.io/client-go/util/retry"
 	"encoding/json"
 	"log"
 
@@ -51,15 +54,27 @@ func ScaleDeploymentHandler(q *dialogflow.GoogleCloudDialogflowV2WebhookRequest)
 		log.Fatal(err)
 	}
 
-	// Try to list the Pods
-	pods, err := k8sClient.CoreV1().Pods("").List(metav1.ListOptions{})
-	if err != nil {
-		log.Fatal(err)
+	deploymentClient := k8sClient.AppsV1().Deployments(apiv1.NamespaceDefault)
+
+	retryErr := retry.RetryOnConflict(retry.DefaultRetry, func() error {
+		// Retrieve the latest version of Deployment before attempting update
+		// RetryOnConflict uses exponential backoff to avoid exhausting the apiserver
+		result, getErr := deploymentClient.Get("helloworld", metav1.GetOptions{})
+
+		if getErr != nil {
+			panic(fmt.Errorf("Failed to get latest version of Deployment: %v", getErr))
+		}
+
+		result.Spec.Replicas = int32Ptr(int32(parameters.Pods)) // update replica count
+		_, updateErr := deploymentClient.Update(result)
+		return updateErr
+	})
+
+	if retryErr != nil {
+		panic(fmt.Errorf("Update failed: %v", retryErr))
 	}
-	fmt.Printf("Checking kube-system:  %s pods \n", len(pods.Items))
-	for index := range pods.Items {
-		fmt.Printf("Pod %v: %s \n", index+1, pods.Items[index].Name)
-	}
+
+	fmt.Println("Updated deployment...")
 
 	response := &dialogflow.GoogleCloudDialogflowV2WebhookResponse{
 		FulfillmentText: fmt.Sprintf("Scaling the Hello World deployment to %v pods. It's too easy!", parameters.Pods),
@@ -75,3 +90,5 @@ func homeDir() string {
 	}
 	return os.Getenv("USERPROFILE") // For Windows users
 }
+
+func int32Ptr(i int32) *int32 { return &i }
